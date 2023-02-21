@@ -4,20 +4,40 @@ import numpy as np
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+import sys
+sys.path.append("../../../")
+from basic_setting import Paths
+
+# def get_texts(dataset):
+#     conds, texts = {}, {}
+#     for split in ['train', 'dev', 'test']:
+#         print(f'loading {split} set...')
+#         examples = pickle.load(open(
+#             f'data/{dataset}/{split}.pickle', 'rb'))
+
+#         conds[split], texts[split] = [], []
+#         for example in examples:
+#             conds[split].append(example['condition'])
+#             texts[split].append(example['text'])
+
+#     return conds, texts
+
+import pandas as pd
 
 def get_texts(dataset):
-    conds, texts = {}, {}
-    for split in ['train', 'dev', 'test']:
-        print(f'loading {split} set...')
-        examples = pickle.load(open(
-            f'data/{dataset}/{split}.pickle', 'rb'))
+    currPath = Paths(dataset)
+    data=pd.read_csv(currPath.data_folder+"/hcV3-stories.csv")
 
-        conds[split], texts[split] = [], []
-        for example in examples:
-            conds[split].append(example['condition'])
-            texts[split].append(example['text'])
+    prompts = data['mainEvent'].tolist()
+    stories = data['story'].tolist()
+    conds, texts = {}, {}
+
+    conds['train'], texts['train'] = prompts[:len(prompts)**0.8], prompts[:len(prompts)**0.8]
+    conds['dev'], texts['dev'] = prompts[len(prompts)**0.8:len(prompts)**0.9], prompts[len(prompts)**0.8:len(prompts)**0.9]
+    conds['test'], texts['test'] = prompts[len(prompts)**0.9:len(prompts)], prompts[len(prompts)**0.9:len(prompts)]
 
     return conds, texts
+
 
 
 def get_vocab(texts, rate):
@@ -55,8 +75,7 @@ def get_vocab(texts, rate):
     return result_list, analyzer
 
 
-def main(rate, dataset='wp'):
-    assert dataset in ['cnn', 'wp']
+def main(rate, dataset='Hippocorpus'):
 
     conds, texts = get_texts(dataset)
 
