@@ -79,7 +79,7 @@ class BART:
         random.shuffle(self._dataset['train'])
         for i in trange(0, len(self._dataset['train']), batch_size,
                         desc='BART Training'):
-            self._model.split_to_gpus(2)
+            self._model.split_to_gpus(1)
             self._model.train()
 
             batch = self._dataset['train'][i:i + batch_size]
